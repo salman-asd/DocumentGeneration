@@ -1,0 +1,157 @@
+﻿@using System.Globalization
+@model DocumentGeneration.Models.InvoiceData
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice #@Model.InvoiceNumber</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header-footer-color {
+            background-color: #2B4A58;
+            height: 20px;
+            width: 100%;
+        }
+
+        /* Add print-specific styles */
+        @@media print {
+            .page-break {
+                page-break-before: always;
+            }
+
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Header -->
+    <div class="header-footer-color"></div>
+
+    <!-- Content -->
+    <div class="px-8 py-6">
+        <!-- Title Section -->
+        <div class="pt-5">
+            <h1 class="text-3xl font-bold text-black">INVOICE</h1>
+        </div>
+
+        <!-- Company and Client Info Section -->
+        <div class="flex justify-between mt-10">
+            <!-- Your Company Info -->
+            <div class="flex-1">
+                <h3 class="font-bold text-[#2B4A58]">@Model.CompanyName</h3>
+                <p>@Model.CompanyAddress</p>
+                <p>@Model.CompanyCity, @Model.CompanyState</p>
+                <p>@Model.CompanyCountry</p>
+                <p>@Model.CompanyPostal</p>
+            </div>
+
+            <!-- Client Info -->
+            <div class="flex-1">
+                <h3 class="font-extrabold text-[#2B4A58]">INVOICE TO:</h3>
+                <p>@Model.ClientName</p>
+                <p>@Model.ClientAddress</p>
+                <p>@Model.ClientCity, @Model.ClientState</p>
+                <p>@Model.ClientCountry</p>
+                <p>@Model.ClientPostal</p>
+            </div>
+
+            <!-- Invoice Details -->
+            <div class="flex-1 text-right">
+                <h3 class="font-extrabold text-[#2B4A58]">Invoice Number</h3>
+                <p>#@Model.InvoiceNumber</p>
+                <h3 class="font-extrabold text-[#2B4A58]">Date of Invoice</h3>
+                <p>@Model.InvoiceDate</p>
+                <h3 class="font-extrabold text-[#2B4A58]">Due Date</h3>
+                <p>@Model.DueDate</p>
+            </div>
+        </div>
+
+        <!-- Line Items Table -->
+        <div class="mt-10">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr>
+                        <th class="text-left p-2 text-white font-bold" style="background-color: #2B4A58;">DESCRIPTION</th>
+                        <th class="p-2 text-white font-bold" style="background-color: #2B4A58;">QTY</th>
+                        <th class="p-2 text-white font-bold" style="background-color: #2B4A58;">UNIT PRICE</th>
+                        <th class="p-2 text-white font-bold" style="background-color: #2B4A58;">TOTAL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.LineItems)
+                    {
+                        var price = decimal.Parse(item.Price, CultureInfo.InvariantCulture);
+                        var total = price * item.Quantity;
+                        var background = item.Index % 2 == 0 ? "bg-gray-200" : "bg-gray-100";
+
+                        <tr class="@background">
+                            <td class="p-2">@item.Name</td>
+                            <td class="p-2 text-center">@item.Quantity</td>
+                            <td class="p-2 text-center">$@price.ToString("F2")</td>
+                            <td class="p-2 text-center">$@total.ToString("F2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="mt-5">
+            <table class="ml-auto">
+                <tr>
+                    <td class="font-bold p-1 text-right">SUBTOTAL</td>
+                    <td class="p-1 text-right">$@Model.Subtotal.ToString("F2")</td>
+                </tr>
+                <tr>
+                    <td class="font-bold p-1 text-right">DISCOUNT</td>
+                    <td class="p-1 text-right">$@Model.Discount.ToString("F2")</td>
+                </tr>
+                <tr>
+                    <td class="font-bold p-1 text-right">SUBTOTAL LESS DISCOUNT</td>
+                    <td class="p-1 text-right">$@Model.SubtotalLessDiscount.ToString("F2")</td>
+                </tr>
+                <tr>
+                    <td class="font-bold p-1 text-right">TAX RATE</td>
+                    <td class="p-1 text-right">@((Model.TaxRate * 100).ToString("F0"))%</td>
+                </tr>
+                <tr>
+                    <td class="font-bold p-1 text-right">TAX TOTAL</td>
+                    <td class="p-1 text-right">$@Model.TaxTotal.ToString("F2")</td>
+                </tr>
+                <tr>
+                    <td class="font-bold p-1 text-right">BALANCE DUE</td>
+                    <td class="p-1 text-right font-bold">$@Model.BalanceDue.ToString("F2")</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Notes and Terms -->
+        <div class="mt-10">
+            <h3 class="font-bold">NOTES:</h3>
+            <p class="mb-5">@Model.Notes</p>
+
+            <h3 class="font-bold">TERMS AND CONDITIONS:</h3>
+            <p>@Model.Terms</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="fixed bottom-0 w-full">
+        <div class="header-footer-color"></div>
+    </div>
+</body>
+</html>
