@@ -1,6 +1,9 @@
 ﻿using DinkToPdf;
+using DinkToPdf.Contracts;
 using DocumentGeneration.Data;
 using DocumentGeneration.Models;
+using DocumentGeneration.Utilities;
+using Microsoft.AspNetCore.Mvc;
 using Razor.Templating.Core;
 
 namespace DocumentGeneration.Endpoints;
@@ -20,7 +23,7 @@ public static class DinkToPdfGenerate
             var converter = new SynchronizedConverter(new PdfTools());
 
             // Create HTML content from template
-            string htmlContent = await GenerateInvoiceHtml(invoiceData, "invoice_dink");
+            string htmlContent = await UtilitiesExtension.GenerateHtmlContent(invoiceData, "invoice_dink");
 
             // Set DinkToPdf converter settings with improved configuration
             var doc = new HtmlToPdfDocument()
@@ -62,12 +65,39 @@ public static class DinkToPdfGenerate
         .WithName("dinkToPdf-get-invoice-pdf")
         .WithOpenApi();
 
-        group.MapGet("get-invoice-preview", async (int? lineItemCount = 10) =>
+        //group.MapGet("get-invoice-preview", async (int? lineItemCount = 10) =>
+        //{
+        //    var invoiceData = FakeData.GenerateInvoiceData(lineItemCount ?? 10);
+
+        //    // Create HTML content from template
+        //    string htmlContent = await UtilitiesExtension.GenerateHtmlContent<InvoiceData>(invoiceData, "invoice_puppeteer");
+        //    return Results.Content(htmlContent, "text/html");
+        //})
+        //.WithName("dinkToPdf-get-invoice-preview")
+        //.WithOpenApi();
+
+        group.MapGet("get-invoice-pdf2", async ([FromServices] IConverter converter, int? lineItemCount = 10) =>
         {
+            // Generate invoice data
             var invoiceData = FakeData.GenerateInvoiceData(lineItemCount ?? 10);
 
             // Create HTML content from template
-            string htmlContent = await GenerateInvoiceHtml(invoiceData, "invoice_dink");
+            string htmlContent = await UtilitiesExtension.GenerateHtmlContent<InvoiceData>(invoiceData, "invoice_puppeteer");
+
+            // Generate PDF using DinkToPdf
+            byte[] pdfBytes = GeneratePdfFromHtml(htmlContent, converter);
+
+            return Results.File(pdfBytes, "application/pdf", $"invoice-{invoiceData.InvoiceNumber}.pdf");
+        })
+        .WithName("dinkToPdf-get-invoice-pdf2")
+        .WithOpenApi();
+
+
+        group.MapGet("get-invoice-preview", async (int? lineItemCount = 10) =>
+        {
+            var invoiceData = FakeData.GenerateInvoiceData(lineItemCount ?? 10);
+            string htmlContent = await UtilitiesExtension.GenerateHtmlContent<InvoiceData>(invoiceData, "invoice_dinktopdf");
+
             return Results.Content(htmlContent, "text/html");
         })
         .WithName("dinkToPdf-get-invoice-preview")
@@ -76,9 +106,33 @@ public static class DinkToPdfGenerate
         return routes;
     }
 
-    private static async Task<string> GenerateInvoiceHtml(InvoiceData invoice, string viewName)
+
+    private static byte[] GeneratePdfFromHtml(string htmlContent, IConverter converter)
     {
-        var html = await RazorTemplateEngine.RenderAsync($"Views/{viewName}.cshtml", invoice);
-        return html;
+        var globalSettings = new GlobalSettings
+        {
+            ColorMode = ColorMode.Color,
+            Orientation = Orientation.Portrait,
+            PaperSize = PaperKind.A4,
+            Margins = new MarginSettings { Top = 60, Bottom = 40 },
+            DocumentTitle = "Invoice PDF"
+        };
+
+        var objectSettings = new ObjectSettings
+        {
+            PagesCount = true,
+            HtmlContent = htmlContent,
+            WebSettings = { DefaultEncoding = "utf-8", PrintMediaType = true },
+            HeaderSettings = { FontSize = 12, Center = "Invoice Details", Spacing = 5 },
+            FooterSettings = { FontSize = 10, Left = $"Printed on {DateTime.Now:yyyy-MM-dd HH:mm:ss}", Right = "[page] of [toPage]", Spacing = 5 }
+        };
+
+        var pdf = new HtmlToPdfDocument()
+        {
+            GlobalSettings = globalSettings,
+            Objects = { objectSettings }
+        };
+
+        return converter.Convert(pdf);
     }
 }
