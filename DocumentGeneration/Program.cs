@@ -41,6 +41,7 @@ app.MapGet("/weatherforecast", () =>
 app.MapQuestPdfGenerate();
 app.MapDinkToPdfGenerate();
 app.MapPdfSharpPdfGenerate();
+app.MapPuppeteerPdfGenerate();
 
 app.Run();
 

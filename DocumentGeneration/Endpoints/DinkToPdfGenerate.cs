@@ -73,8 +73,6 @@ public static class DinkToPdfGenerate
         .WithName("dinkToPdf-get-invoice-preview")
         .WithOpenApi();
 
-
-
         return routes;
     }
 
