@@ -1,8 +1,5 @@
 ﻿using DinkToPdf;
 using DinkToPdf.Contracts;
-using DocumentGeneration.Data;
-using DocumentGeneration.Models;
-using DocumentGeneration.Utilities;
 using System.Diagnostics;
 
 namespace DocumentGeneration.Endpoints;
@@ -26,7 +23,7 @@ public static class DinkToPdfGenerate
                 var invoiceData = FakeData.GenerateInvoiceData(lineItemCount ?? 10);
 
                 // Create HTML content from template - use the new CSS-based template
-                string htmlContent = await UtilitiesExtension.GenerateHtmlContent(invoiceData, "invoice_dinktopdf");
+                string htmlContent = await UtilitiesExtension.GenerateHtmlContent<InvoiceData>(invoiceData, "invoice_dinktopdf");
 
                 // Log time spent generating HTML
                 context.Response.Headers.Append("X-HTML-Generation-Time", $"{stopwatch.ElapsedMilliseconds}ms");

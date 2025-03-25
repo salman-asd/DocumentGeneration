@@ -1,9 +1,6 @@
-﻿using System.Globalization;
-using DocumentGeneration.Data;
-using MigraDoc.DocumentObjectModel;
-using MigraDoc.DocumentObjectModel.Tables;
+﻿using MigraDoc.DocumentObjectModel;
 using MigraDoc.Rendering;
-using PdfSharp.Pdf;
+using System.Globalization;
 
 namespace DocumentGeneration.Endpoints;
 

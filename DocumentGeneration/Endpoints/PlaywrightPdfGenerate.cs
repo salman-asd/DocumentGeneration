@@ -1,9 +1,4 @@
-﻿using DocumentGeneration.Data;
-using DocumentGeneration.Models;
-using DocumentGeneration.Utilities;
-using Microsoft.Playwright;
-using System;
-using System.Threading.Tasks;
+﻿using Microsoft.Playwright;
 
 namespace DocumentGeneration.Endpoints;
 

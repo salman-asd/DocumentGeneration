@@ -1,8 +1,5 @@
-﻿using DocumentGeneration.Data;
-using DocumentGeneration.Models;
-using DocumentGeneration.Utilities;
+﻿using PuppeteerSharp;
 using PuppeteerSharp.Media;
-using PuppeteerSharp;
 
 namespace DocumentGeneration.Endpoints;
 
