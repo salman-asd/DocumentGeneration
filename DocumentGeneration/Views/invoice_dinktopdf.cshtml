@@ -7,226 +7,242 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice</title>
     <style>
-        /* Reset and base styles */
         body {
             font-family: Arial, sans-serif;
+            line-height: 1.6;
             margin: 0;
-            padding: 0;
-            background-color: white;
-            font-size: 12px;
+            padding: 20px;
+            background-color: #f5f5f5;
         }
 
-        /* Layout containers */
-        .container {
-            width: 98%;
-            background-color: white;
-            padding: 10px; /* Reduced padding from 20px to 10px */
+        .invoice {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        /* Header styles */
-        .header {
+        .header h1 {
             text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
+            color: #333;
+            margin: 0 0 20px 0;
         }
 
-        /* Invoice info section */
         .invoice-info {
-            display: flex;
-            justify-content: flex-start; /* Changed from space-between to flex-start */
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 15px;
-            margin-bottom: 15px;
+            width: 100%;
+            overflow: hidden; /* Clears floats */
         }
 
-        .company-info {
-            flex: 2; /* More space for company info */
+            .invoice-info > div {
+                width: 32%;
+                float: left;
+                margin-right: 2%;
+            }
+
+                .invoice-info > div:last-child {
+                    margin-right: 0;
+                }
+
+            .invoice-info p {
+                margin-top: 0rem;
+                margin-bottom: 0rem;
+            }
+
+        h2, h3 {
+            color: #666;
+            margin: 0 0 0 0;
         }
 
-        .client-info {
-            flex: 3; /* More space for client info and spacing between sections */
-            padding-left: 40px; /* Add padding for gap between invoice and invoice to */
-        }
 
-        .invoice-details {
-            flex: 2;
-            text-align: right;
-        }
-
-        .company-title {
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .label {
-            font-weight: bold;
-        }
-
-        .text-gray {
-            color: #718096;
-        }
-
-        /* Table styles */
-        .table-container {
-            width: 98%;
-        }
 
         table {
-            width: 97%;
+            width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
-            page-break-inside: auto; /* Allow page breaks within tables */
-        }
-
-        tr {
-            page-break-inside: avoid; /* Keep rows together */
-            page-break-after: auto;
+            margin-bottom: 30px;
         }
 
         th {
-            background-color: #edf2f7;
+            background-color: #f8f9fa;
+            padding: 12px;
             text-align: left;
-            padding: 8px;
-            border: 1px solid #e2e8f0;
+            border-bottom: 2px solid #dee2e6;
         }
 
         td {
-            padding: 8px;
-            border: 1px solid #e2e8f0;
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
         }
 
-        .text-center {
-            text-align: center;
+        tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
         }
 
-        .text-right {
-            text-align: right;
+        .summary {
+            margin-left: auto;
+            width: 300px;
         }
 
-        /* Alternating row colors */
-        tr.row-even {
-            background-color: #edf2f7;
-        }
-
-        tr.row-odd {
-            background-color: #f7fafc;
-        }
-
-        /* Summary table */
-        .summary-container {
+        .summary-row {
             display: flex;
-            justify-content: flex-end; /* Ensure right alignment */
-            margin-top: 20px;
-            width: 98%;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
         }
 
-        .summary-table {
-            width: 40%; /* Reduced from 50% to match item table width better */
+            .summary-row.total {
+                font-weight: bold;
+                font-size: 1.2em;
+                border-top: 2px solid #333;
+                border-bottom: none;
+                padding-top: 15px;
+            }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
         }
 
-        .summary-row-highlight {
-            background-color: #edf2f7;
-            font-weight: bold;
-        }
+        @@media print {
+            body {
+                background: none;
+                padding: 0;
+            }
 
-        /* Footer text */
-        .footer-text {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #718096;
-        }
-
-        /* Make sure last column is wide enough */
-        .total-column {
-            min-width: 100px; /* Ensure total column has enough width */
+            .invoice {
+                box-shadow: none;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">EasyPOS</div>
+    <div class="invoice">
+        <div class="header">
+            <h1>EasyPOS</h1>
+            <div class="invoice-info">
+                <div class="left">
+                    <h2>INVOICE</h2>
+                    <p>Parker, Boyle and Schmidt</p>
+                    <p>5211 Lysanne Inlet, Stewartberg</p>
+                    <p>NM, 22758, Malta</p>
+                </div>
+                <div class="invoice-to">
+                    <h3>INVOICE TO:</h3>
+                    <p>Stroman, Heidenreich and Rolfson</p>
+                    <p>1414 Bosco Trafficway, Port Candido</p>
+                    <p>MO, 10429, Isle of Man</p>
+                </div>
+                <div class="dates">
+                    <p><strong>Invoice Number:</strong> 2229</p>
+                    <p><strong>Date of Issue:</strong> 2025-03-12</p>
+                    <p><strong>Due Date:</strong> 2025-03-12</p>
+                </div>
 
-        <div class="invoice-info">
-            <div class="company-info">
-                <div class="company-title">INVOICE</div>
-                <div>@Model.CompanyName</div>
-                <div>@Model.CompanyAddress, @Model.CompanyCity</div>
-                <div>@Model.CompanyState, @Model.CompanyPostal, @Model.CompanyCountry</div>
-            </div>
-
-            <div class="client-info">
-                <div class="label">INVOICE TO:</div>
-                <div>@Model.ClientName</div>
-                <div>@Model.ClientAddress, @Model.ClientCity</div>
-                <div>@Model.ClientState, @Model.ClientPostal, @Model.ClientCountry</div>
-            </div>
-
-            <div class="invoice-details">
-                <div>Invoice Number: <strong>@Model.InvoiceNumber</strong></div>
-                <div>Date of Issue: <strong>@Model.InvoiceDate</strong></div>
-                <div>Due Date: <strong>@Model.DueDate</strong></div>
             </div>
         </div>
 
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Description</th>
-                        <th class="text-center">Qty</th>
-                        <th class="text-right">Unit Price</th>
-                        <th class="text-right total-column">Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (int i = 0; i < Model.LineItems.Count; i++)
-                    {
-                        var item = Model.LineItems[i];
-                        var price = decimal.Parse(item.Price, System.Globalization.CultureInfo.InvariantCulture);
-                        var total = price * item.Quantity;
-                        var rowClass = i % 2 == 0 ? "row-even" : "row-odd";
+        <table>
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Qty</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Intelligent Soft Hat</td>
+                    <td>5</td>
+                    <td>$557.29</td>
+                    <td>$2786.45</td>
+                </tr>
+                <tr>
+                    <td>Refined Cotton Table</td>
+                    <td>1</td>
+                    <td>$40.36</td>
+                    <td>$40.36</td>
+                </tr>
+                <tr>
+                    <td>Sleek Fresh Pants</td>
+                    <td>3</td>
+                    <td>$478.15</td>
+                    <td>$1434.45</td>
+                </tr>
+                <tr>
+                    <td>Rustic Wooden Shoes</td>
+                    <td>1</td>
+                    <td>$247.07</td>
+                    <td>$247.07</td>
+                </tr>
+                <tr>
+                    <td>Ergonomic Steel Sausages</td>
+                    <td>5</td>
+                    <td>$267.52</td>
+                    <td>$1337.60</td>
+                </tr>
+                <tr>
+                    <td>Handcrafted Metal Sausages</td>
+                    <td>2</td>
+                    <td>$110.00</td>
+                    <td>$220.00</td>
+                </tr>
+                <tr>
+                    <td>Sleek Fresh Towels</td>
+                    <td>4</td>
+                    <td>$658.01</td>
+                    <td>$2632.04</td>
+                </tr>
+                <tr>
+                    <td>Licensed Wooden Chair</td>
+                    <td>2</td>
+                    <td>$564.15</td>
+                    <td>$1128.30</td>
+                </tr>
+                <tr>
+                    <td>Refined Frozen Salad</td>
+                    <td>2</td>
+                    <td>$781.15</td>
+                    <td>$1562.30</td>
+                </tr>
+                <tr>
+                    <td>Handmade Rubber Gloves</td>
+                    <td>5</td>
+                    <td>$43.09</td>
+                    <td>$215.45</td>
+                </tr>
+            </tbody>
+        </table>
 
-                        <tr class="@rowClass">
-                            <td>@item.Name</td>
-                            <td class="text-center">@item.Quantity</td>
-                            <td class="text-right">$@price.ToString("F2")</td>
-                            <td class="text-right total-column">$@total.ToString("F2")</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+        <div class="summary">
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span>$11604.02</span>
+            </div>
+            <div class="summary-row">
+                <span>Discount</span>
+                <span>$580.2010</span>
+            </div>
+            <div class="summary-row">
+                <span>Subtotal Less Discount</span>
+                <span>$11023.8190</span>
+            </div>
+            <div class="summary-row">
+                <span>Tax (0.1%)</span>
+                <span>$1102.38190</span>
+            </div>
+            <div class="summary-row total">
+                <span>Balance Due</span>
+                <span>$12126.20090</span>
+            </div>
         </div>
 
-        <div class="summary-container">
-            <table class="summary-table">
-                <tbody>
-                    <tr>
-                        <td class="text-right label">Subtotal</td>
-                        <td class="text-right">$@Model.Subtotal</td>
-                    </tr>
-                    <tr>
-                        <td class="text-right label">Discount</td>
-                        <td class="text-right">$@Model.Discount</td>
-                    </tr>
-                    <tr>
-                        <td class="text-right label">Subtotal Less Discount</td>
-                        <td class="text-right">$@Model.SubtotalLessDiscount</td>
-                    </tr>
-                    <tr>
-                        <td class="text-right label">Tax (@Model.TaxRate%)</td>
-                        <td class="text-right">$@Model.TaxTotal</td>
-                    </tr>
-                    <tr class="summary-row-highlight">
-                        <td class="text-right">Balance Due</td>
-                        <td class="text-right">$@Model.BalanceDue</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="footer">
+            <p>Thank you for your business!</p>
+            <p>Payment is due within 30 days. Late payments may be subject to additional fees.</p>
         </div>
-
-        <div class="footer-text">@Model.Notes</div>
-        <div class="footer-text">@Model.Terms</div>
     </div>
 </body>
 </html>

@@ -26,7 +26,7 @@ public static class DinkToPdfGenerate
                 var invoiceData = FakeData.GenerateInvoiceData(lineItemCount ?? 10);
 
                 // Create HTML content from template - use the new CSS-based template
-                string htmlContent = await UtilitiesExtension.GenerateHtmlContent(invoiceData, "invoice_dinktopdf2");
+                string htmlContent = await UtilitiesExtension.GenerateHtmlContent(invoiceData, "invoice_dinktopdf");
 
                 // Log time spent generating HTML
                 context.Response.Headers.Append("X-HTML-Generation-Time", $"{stopwatch.ElapsedMilliseconds}ms");
@@ -61,7 +61,7 @@ public static class DinkToPdfGenerate
             var invoiceData = FakeData.GenerateInvoiceData(lineItemCount ?? 10);
             // Return the new CSS-based template for preview
             //string htmlContent = await UtilitiesExtension.GenerateHtmlContent<InvoiceData>(invoiceData, "invoice_dinktopdf");
-            string htmlContent = await UtilitiesExtension.GenerateHtmlContent<InvoiceData>(invoiceData, "invoice_dinktopdf2");
+            string htmlContent = await UtilitiesExtension.GenerateHtmlContent<InvoiceData>(invoiceData, "invoice_dinktopdf");
             return Results.Content(htmlContent, "text/html");
         })
         .WithName("dinkToPdf-get-invoice-preview")
