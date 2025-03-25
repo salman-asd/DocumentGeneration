@@ -1,0 +1,232 @@
+﻿@model DocumentGeneration.Models.InvoiceData
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <style>
+        /* Reset and base styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: white;
+            font-size: 12px;
+        }
+
+        /* Layout containers */
+        .container {
+            width: 98%;
+            background-color: white;
+            padding: 10px; /* Reduced padding from 20px to 10px */
+        }
+
+        /* Header styles */
+        .header {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /* Invoice info section */
+        .invoice-info {
+            display: flex;
+            justify-content: flex-start; /* Changed from space-between to flex-start */
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .company-info {
+            flex: 2; /* More space for company info */
+        }
+
+        .client-info {
+            flex: 3; /* More space for client info and spacing between sections */
+            padding-left: 40px; /* Add padding for gap between invoice and invoice to */
+        }
+
+        .invoice-details {
+            flex: 2;
+            text-align: right;
+        }
+
+        .company-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .label {
+            font-weight: bold;
+        }
+
+        .text-gray {
+            color: #718096;
+        }
+
+        /* Table styles */
+        .table-container {
+            width: 98%;
+        }
+
+        table {
+            width: 97%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            page-break-inside: auto; /* Allow page breaks within tables */
+        }
+
+        tr {
+            page-break-inside: avoid; /* Keep rows together */
+            page-break-after: auto;
+        }
+
+        th {
+            background-color: #edf2f7;
+            text-align: left;
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        td {
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        /* Alternating row colors */
+        tr.row-even {
+            background-color: #edf2f7;
+        }
+
+        tr.row-odd {
+            background-color: #f7fafc;
+        }
+
+        /* Summary table */
+        .summary-container {
+            display: flex;
+            justify-content: flex-end; /* Ensure right alignment */
+            margin-top: 20px;
+            width: 98%;
+        }
+
+        .summary-table {
+            width: 40%; /* Reduced from 50% to match item table width better */
+        }
+
+        .summary-row-highlight {
+            background-color: #edf2f7;
+            font-weight: bold;
+        }
+
+        /* Footer text */
+        .footer-text {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #718096;
+        }
+
+        /* Make sure last column is wide enough */
+        .total-column {
+            min-width: 100px; /* Ensure total column has enough width */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">EasyPOS</div>
+
+        <div class="invoice-info">
+            <div class="company-info">
+                <div class="company-title">INVOICE</div>
+                <div>@Model.CompanyName</div>
+                <div>@Model.CompanyAddress, @Model.CompanyCity</div>
+                <div>@Model.CompanyState, @Model.CompanyPostal, @Model.CompanyCountry</div>
+            </div>
+
+            <div class="client-info">
+                <div class="label">INVOICE TO:</div>
+                <div>@Model.ClientName</div>
+                <div>@Model.ClientAddress, @Model.ClientCity</div>
+                <div>@Model.ClientState, @Model.ClientPostal, @Model.ClientCountry</div>
+            </div>
+
+            <div class="invoice-details">
+                <div>Invoice Number: <strong>@Model.InvoiceNumber</strong></div>
+                <div>Date of Issue: <strong>@Model.InvoiceDate</strong></div>
+                <div>Due Date: <strong>@Model.DueDate</strong></div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th class="text-center">Qty</th>
+                        <th class="text-right">Unit Price</th>
+                        <th class="text-right total-column">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.LineItems.Count; i++)
+                    {
+                        var item = Model.LineItems[i];
+                        var price = decimal.Parse(item.Price, System.Globalization.CultureInfo.InvariantCulture);
+                        var total = price * item.Quantity;
+                        var rowClass = i % 2 == 0 ? "row-even" : "row-odd";
+
+                        <tr class="@rowClass">
+                            <td>@item.Name</td>
+                            <td class="text-center">@item.Quantity</td>
+                            <td class="text-right">$@price.ToString("F2")</td>
+                            <td class="text-right total-column">$@total.ToString("F2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="summary-container">
+            <table class="summary-table">
+                <tbody>
+                    <tr>
+                        <td class="text-right label">Subtotal</td>
+                        <td class="text-right">$@Model.Subtotal</td>
+                    </tr>
+                    <tr>
+                        <td class="text-right label">Discount</td>
+                        <td class="text-right">$@Model.Discount</td>
+                    </tr>
+                    <tr>
+                        <td class="text-right label">Subtotal Less Discount</td>
+                        <td class="text-right">$@Model.SubtotalLessDiscount</td>
+                    </tr>
+                    <tr>
+                        <td class="text-right label">Tax (@Model.TaxRate%)</td>
+                        <td class="text-right">$@Model.TaxTotal</td>
+                    </tr>
+                    <tr class="summary-row-highlight">
+                        <td class="text-right">Balance Due</td>
+                        <td class="text-right">$@Model.BalanceDue</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer-text">@Model.Notes</div>
+        <div class="footer-text">@Model.Terms</div>
+    </div>
+</body>
+</html>

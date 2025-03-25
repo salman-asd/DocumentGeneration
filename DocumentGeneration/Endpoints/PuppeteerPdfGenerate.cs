@@ -18,7 +18,7 @@ namespace DocumentGeneration.Endpoints
                 var invoiceData = FakeData.GenerateInvoiceData(lineItemCount ?? 10);
 
                 // Create HTML content from template
-                string htmlContent = await UtilitiesExtension.GenerateHtmlContent<InvoiceData>(invoiceData, "invoice_puppeteer");
+                string htmlContent = await UtilitiesExtension.GenerateHtmlContent<InvoiceData>(invoiceData, "invoice");
 
                 // Generate PDF
                 // Convert HTML to PDF using PuppeteerSharp
@@ -34,7 +34,7 @@ namespace DocumentGeneration.Endpoints
                 var invoiceData = FakeData.GenerateInvoiceData(lineItemCount ?? 10);
 
                 // Create HTML content from template
-                string htmlContent = await UtilitiesExtension.GenerateHtmlContent<InvoiceData>(invoiceData, "invoice_puppeteer");
+                string htmlContent = await UtilitiesExtension.GenerateHtmlContent<InvoiceData>(invoiceData, "invoice");
 
                 return Results.Content(htmlContent, "text/html");
             })
