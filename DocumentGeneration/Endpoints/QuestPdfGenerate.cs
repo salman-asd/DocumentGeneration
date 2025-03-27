@@ -203,6 +203,165 @@ public static class QuestPdfGenerate
         .WithName("questPdf-get-invoice-pdf")
         .WithOpenApi();
 
+        group.MapGet("get-invoice-pdf2", (int? lineItemCount = 10) =>
+        {
+            // Generate invoice data
+            var invoiceData = FakeData.GenerateInvoiceData(lineItemCount ?? 10);
+
+            QuestPDF.Settings.License = LicenseType.Community;
+
+            var document = Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.Margin(30);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(10).FontFamily("Arial"));
+
+                    // -----------------------------
+                    // Header (single definition)
+                    // -----------------------------
+                    page.Header().Column(headerColumn =>
+                    {
+                        // Top centered Invoice title
+                        //headerColumn.Item().AlignCenter().Text("Invoice")
+                        //    .FontSize(20).Bold()
+                        //    .PaddingBottom(10); // add some spacing
+
+                        // Header row: left (company) and right (invoice info)
+                        headerColumn.Item().Row(row =>
+                        {
+                            // Left side: company info
+                            row.RelativeItem().Column(column =>
+                            {
+                                column.Item().Text("EasyPOS")
+                                    .FontSize(16).Bold().FontColor(Colors.Blue.Medium);
+                                column.Item().Text("Gorczany - Mitchell");
+                                column.Item().Text("566 Jovan Shoals, East Edythe");
+                                column.Item().Text("PA, 42103-3716, Eritrea");
+                            });
+
+                            // Right side: invoice details
+                            row.RelativeItem().AlignRight().Column(column =>
+                            {
+                                column.Item().Text("INVOICE")
+                                    .FontSize(16).Bold().FontColor(Colors.Blue.Medium);
+                                column.Item().Text($"Invoice Number: {invoiceData.InvoiceNumber}");
+                                column.Item().Text($"Date of Issue: {invoiceData.InvoiceDate:yyyy-MM-dd}");
+                                column.Item().Text($"Due Date: {invoiceData.DueDate:yyyy-MM-dd}");
+                            });
+                        });
+                    });
+
+                    // -----------------------------
+                    // Main Content
+                    // -----------------------------
+                    page.Content().Column(column =>
+                    {
+                        // INVOICE TO:
+                        column.Item().PaddingVertical(15).Column(innerCol =>
+                        {
+                            innerCol.Item().Text("INVOICE TO:")
+                                .Bold().FontColor(Colors.Blue.Medium);
+                            innerCol.Item().Text(invoiceData.ClientName);
+                            innerCol.Item().Text(invoiceData.ClientAddress);
+                            innerCol.Item().Text($"{invoiceData.ClientCity}, {invoiceData.ClientState}, {invoiceData.ClientPostal}");
+                            innerCol.Item().Text(invoiceData.ClientCountry);
+                        });
+
+                        // Line Items Table
+                        column.Item().PaddingTop(15).Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn(4); // Description
+                                columns.RelativeColumn(1); // Qty
+                                columns.RelativeColumn(2); // Unit Price
+                                columns.RelativeColumn(2); // Total
+                            });
+
+                            // Table Header
+                            table.Header(header =>
+                            {
+                                header.Cell().Background(Colors.Blue.Lighten4).Padding(5)
+                                    .Text("Description").Bold();
+                                header.Cell().Background(Colors.Blue.Lighten4).Padding(5)
+                                    .Text("Qty").Bold().AlignCenter();
+                                header.Cell().Background(Colors.Blue.Lighten4).Padding(5)
+                                    .Text("Unit Price").Bold().AlignRight();
+                                header.Cell().Background(Colors.Blue.Lighten4).Padding(5)
+                                    .Text("Total").Bold().AlignRight();
+                            });
+
+                            // Table Content
+                            foreach (var item in invoiceData.LineItems)
+                            {
+                                decimal price = decimal.Parse(item.Price, CultureInfo.InvariantCulture);
+                                decimal total = price * item.Quantity;
+
+                                table.Cell().Padding(5).Text(item.Name);
+                                table.Cell().Padding(5).Text(item.Quantity.ToString()).AlignCenter();
+                                table.Cell().Padding(5).Text($"${price:F2}").AlignRight();
+                                table.Cell().Padding(5).Text($"${total:F2}").AlignRight();
+                            }
+                        });
+
+                        // Summary Table (Right-Aligned), near the bottom
+                        column.Item().PaddingTop(20).AlignRight().Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn();
+                                columns.ConstantColumn(100);
+                            });
+
+                            table.Cell().Text("Subtotal").Bold();
+                            table.Cell().Text($"${invoiceData.Subtotal:F2}").AlignRight();
+
+                            table.Cell().Text("Discount").Bold();
+                            table.Cell().Text($"${invoiceData.Discount:F2}").AlignRight();
+
+                            table.Cell().Text("Subtotal Less Discount").Bold();
+                            table.Cell().Text($"${invoiceData.SubtotalLessDiscount:F2}").AlignRight();
+
+                            table.Cell().Text("Tax (0.1%)").Bold();
+                            table.Cell().Text($"${invoiceData.TaxTotal:F2}").AlignRight();
+
+                            table.Cell().Text("Balance Due").Bold().FontColor(Colors.Blue.Medium);
+                            table.Cell().Text($"${invoiceData.BalanceDue:F2}")
+                                .Bold().AlignRight().FontColor(Colors.Blue.Medium);
+                        });
+
+                        // Thank you / Payment Info
+                        column.Item().PaddingTop(15).Column(msgCol =>
+                        {
+                            msgCol.Item().Text("Thank you for your business!")
+                                .SemiBold().FontColor(Colors.Blue.Medium);
+                            msgCol.Item().Text("Payment is due within 30 days. Late payments may be subject to additional fees.")
+                                .FontSize(9).Italic();
+                        });
+                    });
+
+                    // -----------------------------
+                    // Footer
+                    // -----------------------------
+                    page.Footer()
+                        .AlignRight()
+                        .Text($"Printed on {DateTime.Now:yyyy-MM-dd HH:mm:ss} Page 1 of 1")
+                        .FontColor(Colors.Grey.Medium);
+                });
+            });
+
+            var pdfStream = new MemoryStream();
+            document.GeneratePdf(pdfStream);
+            pdfStream.Position = 0;
+
+            return Results.File(pdfStream, "application/pdf", "invoice.pdf");
+        })
+        .WithName("questPdf-get-invoice-pdf2")
+        .WithOpenApi();
+
         return routes;
     }
 }
